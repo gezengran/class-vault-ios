@@ -9,3 +9,9 @@ xcuserdata/
 *.db-shm
 *.db-wal
 .DS_Store
+
+# Never commit imported student/contact source files.
+*.csv
+*.xlsx
+*.xls
+*.numbers
