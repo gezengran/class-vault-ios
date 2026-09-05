@@ -107,8 +107,10 @@ struct StudentDetailView: View {
     }
 
     private func studentHero(_ details: StudentDetails) -> some View {
-        HStack(spacing: 16) {
-            InitialBadge(text: details.name, size: 68, color: .white.opacity(0.18))
+        let appearance = StudentGenderAppearance(gender: details.gender)
+
+        return HStack(spacing: 16) {
+            InitialBadge(text: details.name, size: 68, color: .white.opacity(0.20))
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(details.name)
@@ -123,13 +125,22 @@ struct StudentDetailView: View {
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.white.opacity(0.82))
                 }
+
+                if let gender = ValueNormalizer.optionalText(details.gender) {
+                    Text(gender)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.white.opacity(0.16), in: Capsule())
+                }
             }
 
             Spacer(minLength: 8)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(22)
-        .background(AppTheme.heroGradient, in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius, style: .continuous))
+        .background(appearance.heroGradient, in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius, style: .continuous))
     }
 
     private func studentInformation(_ details: StudentDetails) -> some View {
@@ -146,7 +157,7 @@ struct StudentDetailView: View {
                         DetailValueRow(title: "当前班级", value: currentClass)
                     }
                     if let primaryClass = details.primarySchoolClass {
-                        DetailValueRow(title: "小学班级", value: primaryClass)
+                        DetailValueRow(title: "小学班级（辅助）", value: primaryClass)
                     }
                     if let school = details.primarySchoolName {
                         DetailValueRow(title: "毕业学校", value: school)

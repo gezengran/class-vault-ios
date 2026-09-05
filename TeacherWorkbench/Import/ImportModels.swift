@@ -125,8 +125,55 @@ public struct ImportAliasDictionary: Sendable {
     ]
 }
 
+/// Extracts the current class from a workbook title or filename such as
+/// "2026级初一（8）班学生信息表.xlsx".  The value is metadata about the
+/// imported table, not a student-provided field, so it is only used when the
+/// source has no explicit current-class column.
+public enum CurrentClassExtractor {
+    public static func extract(from text: String?) -> String? {
+        guard let text = ValueNormalizer.optionalText(text) else { return nil }
+
+        let patterns = [
+            #"((?:初[一二三四五六七八九十]|高[一二三四五六七八九十]|[一二三四五六七八九十]+年级|[七八九]年级|小学)\s*[（(]?\s*[0-9一二三四五六七八九十]{1,2}\s*[）)]?\s*班)"#
+        ]
+
+        for pattern in patterns {
+            guard let expression = try? NSRegularExpression(pattern: pattern),
+                  let match = expression.firstMatch(
+                    in: text,
+                    range: NSRange(text.startIndex..<text.endIndex, in: text)
+                  ),
+                  let range = Range(match.range(at: 1), in: text) else {
+                continue
+            }
+            return normalize(String(text[range]))
+        }
+        return nil
+    }
+
+    static func titleCandidate(from rows: [[String]], beforeHeaderIndex: Int) -> String? {
+        guard beforeHeaderIndex > 0 else { return nil }
+        let candidates = rows.prefix(beforeHeaderIndex).compactMap { row -> String? in
+            let values = row.compactMap { ValueNormalizer.optionalText($0) }
+            guard !values.isEmpty else { return nil }
+            return values.joined(separator: " ")
+        }
+        return candidates.first(where: { extract(from: $0) != nil }) ?? candidates.first
+    }
+
+    private static func normalize(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "　", with: "")
+            .replacingOccurrences(of: "(", with: "（")
+            .replacingOccurrences(of: ")", with: "）")
+    }
+}
+
 public struct ParsedImportDocument: Sendable {
     public let sourceFilename: String?
+    public let tableTitle: String?
+    public let currentClassName: String?
     public let sourceHash: String
     public let headers: [String]
     public let rows: [[String]]
@@ -137,9 +184,16 @@ public struct ParsedImportDocument: Sendable {
         sourceHash: String,
         headers: [String],
         rows: [[String]],
-        headerRowNumber: Int = 1
+        headerRowNumber: Int = 1,
+        tableTitle: String? = nil,
+        currentClassName: String? = nil
     ) {
-        self.sourceFilename = sourceFilename
+        let cleanedFilename = ValueNormalizer.optionalText(sourceFilename)
+        let cleanedTitle = ValueNormalizer.optionalText(tableTitle)
+        self.sourceFilename = cleanedFilename
+        self.tableTitle = cleanedTitle
+        self.currentClassName = ValueNormalizer.optionalText(currentClassName)
+            ?? CurrentClassExtractor.extract(from: cleanedTitle ?? cleanedFilename)
         self.sourceHash = sourceHash
         self.headers = headers
         self.rows = rows

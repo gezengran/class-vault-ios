@@ -1,16 +1,23 @@
 import Foundation
 
 public enum CSVParser {
-    public static func parse(data: Data) throws -> (headers: [String], rows: [[String]], headerRowNumber: Int) {
+    public static func parse(data: Data) throws -> (headers: [String], rows: [[String]], headerRowNumber: Int, tableTitle: String?) {
         guard let text = decode(data) else {
             throw ImportError.unreadableFile
         }
         let records = try parseRecords(text)
-        guard let first = records.first, !first.isEmpty else {
+        guard !records.isEmpty else {
             throw ImportError.emptyTable
         }
 
-        let headers = first.map { $0.replacingOccurrences(of: "\u{FEFF}", with: "").trimmingCharacters(in: .whitespacesAndNewlines) }
+        let normalizedRecords = records.map { record in
+            record.map {
+                $0.replacingOccurrences(of: "\u{FEFF}", with: "")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        let headerIndex = headerRowIndex(in: normalizedRecords)
+        let headers = normalizedRecords[headerIndex]
         guard headers.contains(where: { !$0.isEmpty }) else {
             throw ImportError.emptyTable
         }
@@ -19,8 +26,8 @@ public enum CSVParser {
         }
 
         var rows: [[String]] = []
-        rows.reserveCapacity(max(records.count - 1, 0))
-        for record in records.dropFirst() {
+        rows.reserveCapacity(max(normalizedRecords.count - headerIndex - 1, 0))
+        for record in normalizedRecords.dropFirst(headerIndex + 1) {
             if record.allSatisfy({ ValueNormalizer.optionalText($0) == nil }) {
                 continue
             }
@@ -29,7 +36,34 @@ public enum CSVParser {
             }
             rows.append(record + Array(repeating: "", count: max(headers.count - record.count, 0)))
         }
-        return (headers, rows, 1)
+        return (
+            headers,
+            rows,
+            headerIndex + 1,
+            CurrentClassExtractor.titleCandidate(from: normalizedRecords, beforeHeaderIndex: headerIndex)
+        )
+    }
+
+    private static func headerRowIndex(in records: [[String]]) -> Int {
+        let searchLimit = min(records.count, 20)
+        for index in 0..<searchLimit where isLikelyStudentTable(headers: records[index]) {
+            return index
+        }
+        return records.firstIndex(where: { $0.contains(where: { !$0.isEmpty }) }) ?? 0
+    }
+
+    private static func isLikelyStudentTable(headers: [String]) -> Bool {
+        let mapping = ImportAliasDictionary().proposedMapping(for: headers)
+        let hasName = !mapping.sourceColumns(for: .name).isEmpty
+        let identityFields: Set<CanonicalImportField> = [
+            .studentID, .studentNumber, .className, .primarySchoolClass,
+            .phone, .familyAddress, .idNumber
+        ]
+        let hasIdentity = headers.contains { header in
+            guard let field = mapping.field(for: header) else { return false }
+            return identityFields.contains(field)
+        }
+        return hasName && hasIdentity
     }
 
     private static func decode(_ data: Data) -> String? {

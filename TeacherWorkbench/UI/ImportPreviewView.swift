@@ -97,6 +97,28 @@ struct ImportPreviewView: View {
                     }
                 }
 
+                if let tableTitle = workingPreview.document.tableTitle {
+                    Label(tableTitle, systemImage: "textformat")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+
+                if let currentClassName = workingPreview.document.currentClassName,
+                   workingPreview.mapping.sourceColumns(for: .className).isEmpty {
+                    Label("将把“\(currentClassName)”写入所有学生的当前班级", systemImage: "person.2.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(AppTheme.accent)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppTheme.accent.opacity(0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                } else if workingPreview.mapping.sourceColumns(for: .className).isEmpty {
+                    Label("未识别到当前班级；可在导入后手动补录", systemImage: "person.2.slash")
+                        .font(.footnote)
+                        .foregroundStyle(AppTheme.warning)
+                }
+
                 HStack(spacing: 10) {
                     PreviewMetric(title: "数据行", value: "\(workingPreview.document.rows.count)", color: AppTheme.accent)
                     PreviewMetric(title: "可导入", value: "\(workingPreview.acceptedRows.count)", color: AppTheme.success)

@@ -30,6 +30,14 @@ public final class SQLiteStudentRepository: StudentRepository, @unchecked Sendab
         try database.getStudentDetails(studentID: studentID)
     }
 
+    public func addStudent(draft: StudentDraft) throws -> StudentSummary {
+        try database.addStudent(draft: draft)
+    }
+
+    public func archiveStudent(studentID: String) throws {
+        try database.archiveStudent(studentID: studentID)
+    }
+
     public func previewImport(_ url: URL, strictMatching: Bool = false) throws -> ImportPreview {
         let document = try importService.load(url: url)
         return try preflight(importService.buildPreview(from: document, strictMatching: strictMatching))

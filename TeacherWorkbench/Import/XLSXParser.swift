@@ -2,7 +2,7 @@ import Foundation
 import ZIPFoundation
 
 public enum XLSXParser {
-    public static func parse(data: Data) throws -> (headers: [String], rows: [[String]], headerRowNumber: Int) {
+    public static func parse(data: Data) throws -> (headers: [String], rows: [[String]], headerRowNumber: Int, tableTitle: String?) {
         let archive: Archive
         do {
             archive = try Archive(data: data, accessMode: .read)
@@ -36,7 +36,7 @@ public enum XLSXParser {
         }
 
         var seenPaths = Set<String>()
-        var fallbackTable: (headers: [String], rows: [[String]], headerRowNumber: Int)?
+        var fallbackTable: NormalizedTable?
         var bestFallbackScore = Int.min
         var lastError: Error?
 
@@ -55,7 +55,7 @@ public enum XLSXParser {
                     bestFallbackScore = score
                 }
                 if isLikelyStudentTable(headers: table.headers) {
-                    return table
+                    return (table.headers, table.rows, table.headerRowNumber, table.tableTitle)
                 }
             } catch {
                 lastError = error
@@ -63,7 +63,12 @@ public enum XLSXParser {
         }
 
         if let fallbackTable {
-            return fallbackTable
+            return (
+                fallbackTable.headers,
+                fallbackTable.rows,
+                fallbackTable.headerRowNumber,
+                fallbackTable.tableTitle
+            )
         }
         if let importError = lastError as? ImportError {
             throw importError
@@ -74,7 +79,7 @@ public enum XLSXParser {
     private static func normalizeTable(
         _ rows: [[String]],
         rowNumbers: [Int]
-    ) throws -> (headers: [String], rows: [[String]], headerRowNumber: Int)? {
+    ) throws -> NormalizedTable? {
         guard !rows.isEmpty else { return nil }
 
         var firstNonEmptyHeader: (index: Int, headers: [String])?
@@ -112,7 +117,7 @@ public enum XLSXParser {
         rowNumbers: [Int],
         headerIndex: Int,
         headers: [String]
-    ) throws -> (headers: [String], rows: [[String]], headerRowNumber: Int) {
+    ) throws -> NormalizedTable {
         guard headers.count == Set(headers.filter { !$0.isEmpty }).count else {
             throw ImportError.invalidTableStructure("表头名称重复。")
         }
@@ -128,7 +133,12 @@ public enum XLSXParser {
             normalizedRows.append(row + Array(repeating: "", count: max(headers.count - row.count, 0)))
         }
         let headerRowNumber = rowNumbers.indices.contains(headerIndex) ? rowNumbers[headerIndex] : headerIndex + 1
-        return (headers, normalizedRows, headerRowNumber)
+        return NormalizedTable(
+            headers: headers,
+            rows: normalizedRows,
+            headerRowNumber: headerRowNumber,
+            tableTitle: CurrentClassExtractor.titleCandidate(from: rows, beforeHeaderIndex: headerIndex)
+        )
     }
 
     private static func isLikelyStudentTable(headers: [String]) -> Bool {
@@ -144,9 +154,7 @@ public enum XLSXParser {
         return hasName && hasIdentity
     }
 
-    private static func score(
-        for table: (headers: [String], rows: [[String]], headerRowNumber: Int)
-    ) -> Int {
+    private static func score(for table: NormalizedTable) -> Int {
         let normalizedHeaders = Set(table.headers.map(ValueNormalizer.normalizedHeader))
         let recognizedHeaders = ImportAliasDictionary.defaultAliases.values
             .flatMap { $0 }
@@ -222,6 +230,13 @@ public enum XLSXParser {
 
     private struct WorkbookSheet {
         let relationshipID: String
+    }
+
+    private struct NormalizedTable {
+        let headers: [String]
+        let rows: [[String]]
+        let headerRowNumber: Int
+        let tableTitle: String?
     }
 
     private final class SharedStringsXMLParser: NSObject, XMLParserDelegate {

@@ -31,4 +31,19 @@ final class TeacherWorkbenchUITests: XCTestCase {
         app.alerts["确认拨打电话？"].buttons["取消"].tap()
         XCTAssertFalse(app.alerts["确认拨打电话？"].exists)
     }
+
+    func testManualStudentAddSheetIsAvailable() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing-demo-data", "--ui-testing-unlocked"]
+        app.launch()
+
+        let addButton = app.buttons["add-student-button"]
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5))
+        addButton.tap()
+
+        XCTAssertTrue(app.otherElements["student-editor"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.navigationBars["新增学生"].exists)
+        app.buttons["取消"].tap()
+        XCTAssertFalse(app.otherElements["student-editor"].exists)
+    }
 }

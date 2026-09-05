@@ -153,9 +153,9 @@ final class TeacherWorkbenchTests: XCTestCase {
 
     func testSearchByNameAndStudentNumber() throws {
         let csv = """
-        学号,姓名,小学班级,联系方式一
-        SYN-001,Synthetic Student,小学一班,13800000000
-        SYN-002,Another Synthetic Student,小学二班,13900000000
+        学号,姓名,班级,小学班级,性别,联系方式一
+        SYN-001,Synthetic Student,初一（8）班,小学一班,男,13800000000
+        SYN-002,Another Synthetic Student,初一（8）班,小学二班,女,13900000000
         """
 
         try withRepository { repository, _ in
@@ -165,8 +165,78 @@ final class TeacherWorkbenchTests: XCTestCase {
 
             XCTAssertEqual(try repository.listStudents(search: "Another", className: nil).count, 1)
             XCTAssertEqual(try repository.listStudents(search: "SYN-002", className: nil).count, 1)
-            XCTAssertEqual(try repository.listStudents(search: nil, className: "小学一班").count, 1)
+            XCTAssertEqual(try repository.listStudents(search: nil, className: "初一（8）班").count, 2)
+            XCTAssertEqual(try repository.listStudents(search: nil, className: "小学一班").count, 0)
+            XCTAssertEqual(try repository.listStudents(search: "SYN-001", className: nil).first?.gender, "男")
         }
+    }
+
+    func testTableTitleBecomesCurrentClassAndPrimarySchoolClassRemainsSecondary() {
+        let document = ParsedImportDocument(
+            sourceFilename: "2026级初一（8）班学生信息表.xlsx",
+            sourceHash: "title-class-hash",
+            headers: ["学号", "姓名", "小学班级"],
+            rows: [["SYN-001", "Synthetic Student", "小学一班"]],
+            tableTitle: "2026级初一（8）班学生信息表"
+        )
+
+        XCTAssertEqual(document.currentClassName, "初一（8）班")
+
+        let preview = ImportService().buildPreview(from: document, strictMatching: false)
+        XCTAssertTrue(preview.canCommit)
+        XCTAssertEqual(preview.acceptedRows.first?.student.className, "初一（8）班")
+        XCTAssertEqual(preview.acceptedRows.first?.student.primarySchoolClass, "小学一班")
+    }
+
+    func testCSVTitleRowIsDetectedBeforeTheHeader() throws {
+        let csv = """
+        2026级初一（8）班学生信息表,,
+        学号,姓名,小学班级
+        SYN-001,Synthetic Student,小学一班
+        """
+
+        let table = try CSVParser.parse(data: Data(csv.utf8))
+        XCTAssertEqual(table.headerRowNumber, 2)
+        XCTAssertEqual(table.tableTitle, "2026级初一（8）班学生信息表")
+
+        let document = ParsedImportDocument(
+            sourceFilename: "students.csv",
+            sourceHash: "csv-title-hash",
+            headers: table.headers,
+            rows: table.rows,
+            headerRowNumber: table.headerRowNumber,
+            tableTitle: table.tableTitle
+        )
+        XCTAssertEqual(document.currentClassName, "初一（8）班")
+    }
+
+    func testManualStudentAddAndArchive() throws {
+        try withRepository { repository, _ in
+            let student = try repository.addStudent(
+                draft: StudentDraft(
+                    name: "Manual Synthetic Student",
+                    className: "初一（8）班",
+                    studentNumber: "MANUAL-001",
+                    gender: "女"
+                )
+            )
+
+            XCTAssertEqual(student.className, "初一（8）班")
+            XCTAssertEqual(student.gender, "女")
+            XCTAssertEqual(try repository.listStudents(search: nil, className: "初一（8）班").count, 1)
+
+            try repository.archiveStudent(studentID: student.id)
+
+            XCTAssertTrue(try repository.listStudents(search: "Manual Synthetic Student", className: nil).isEmpty)
+            XCTAssertThrowsError(try repository.getStudentDetails(studentID: student.id))
+            XCTAssertGreaterThanOrEqual(try repository.database.changeEventCount(), 2)
+        }
+    }
+
+    func testGenderAppearanceMapsCommonValues() {
+        XCTAssertEqual(StudentGenderAppearance(gender: "男"), .male)
+        XCTAssertEqual(StudentGenderAppearance(gender: "female"), .female)
+        XCTAssertEqual(StudentGenderAppearance(gender: nil), .other)
     }
 
     func testDuplicateAndInvalidPhoneRowsAreReportedBeforeCommit() throws {
@@ -290,6 +360,7 @@ final class TeacherWorkbenchTests: XCTestCase {
 
         XCTAssertEqual(table.headers, ["学号", "姓名", "性别", "联系方式一"])
         XCTAssertEqual(table.headerRowNumber, 3)
+        XCTAssertEqual(table.tableTitle, "2026级初一（8）班学生信息表")
         XCTAssertEqual(table.rows, [["SYN-001", "张三", "男", "13800000000"]])
     }
 

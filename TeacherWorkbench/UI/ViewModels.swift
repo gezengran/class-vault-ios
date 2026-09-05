@@ -20,11 +20,14 @@ final class StudentListViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         do {
+            classNames = try repository.availableClassNames()
+            if !selectedClass.isEmpty && !classNames.contains(selectedClass) {
+                selectedClass = ""
+            }
             students = try repository.listStudents(
                 search: searchText,
                 className: selectedClass.isEmpty ? nil : selectedClass
             )
-            classNames = try repository.availableClassNames()
         } catch {
             errorMessage = "学生数据无法加载。"
         }
@@ -38,6 +41,17 @@ final class StudentListViewModel: ObservableObject {
         let result = try repository.commitImport(preview)
         load()
         return result
+    }
+
+    func addStudent(_ draft: StudentDraft) throws -> StudentSummary {
+        let student = try repository.addStudent(draft: draft)
+        load()
+        return student
+    }
+
+    func archiveStudent(_ studentID: String) throws {
+        try repository.archiveStudent(studentID: studentID)
+        load()
     }
 
     func rebuildImportPreview(_ preview: ImportPreview, mapping: ImportMapping, strictMatching: Bool) throws -> ImportPreview {

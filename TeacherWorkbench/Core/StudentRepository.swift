@@ -4,6 +4,8 @@ public protocol StudentRepository: AnyObject {
     func listStudents(search: String?, className: String?) throws -> [StudentSummary]
     func availableClassNames() throws -> [String]
     func getStudentDetails(studentID: String) throws -> StudentDetails
+    func addStudent(draft: StudentDraft) throws -> StudentSummary
+    func archiveStudent(studentID: String) throws
 
     func previewImport(_ url: URL, strictMatching: Bool) throws -> ImportPreview
     func rebuildImportPreview(

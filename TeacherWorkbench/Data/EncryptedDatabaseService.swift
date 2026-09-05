@@ -9,6 +9,8 @@ public enum DatabaseError: LocalizedError, Equatable, Sendable {
     case migrationFailed
     case recordNotFound
     case invalidPhone
+    case invalidStudentName
+    case duplicateStudentNumber
     case invalidImportedIdentifier
 
     public var errorDescription: String? {
@@ -20,6 +22,8 @@ public enum DatabaseError: LocalizedError, Equatable, Sendable {
         case .migrationFailed: "本地数据库结构迁移失败。"
         case .recordNotFound: "找不到请求的本地记录。"
         case .invalidPhone: "电话号码无效或格式可疑。"
+        case .invalidStudentName: "学生姓名不能为空。"
+        case .duplicateStudentNumber: "该学号已经存在，未新增重复学生。"
         case .invalidImportedIdentifier: "导入的标识符不是允许的不透明标识符。"
         }
     }
@@ -75,15 +79,15 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
         try synchronized {
             var sql = """
                 SELECT student_id, name,
-                       NULLIF(COALESCE(NULLIF(class_name, ''), primary_school_class), '') AS display_class,
-                       student_number
+                       NULLIF(class_name, '') AS display_class,
+                       student_number, gender
                 FROM student
                 WHERE status = 'active'
                 """
             var arguments: [SQLiteValue] = []
 
             if let className = ValueNormalizer.optionalText(className) {
-                sql += " AND COALESCE(NULLIF(class_name, ''), primary_school_class) = ?"
+                sql += " AND NULLIF(class_name, '') = ?"
                 arguments.append(.text(className))
             }
             if let search = ValueNormalizer.optionalText(search) {
@@ -100,7 +104,8 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
                     id: id,
                     name: name,
                     className: text(row, "display_class"),
-                    studentNumber: text(row, "student_number")
+                    studentNumber: text(row, "student_number"),
+                    gender: text(row, "gender")
                 )
             }
         }
@@ -110,10 +115,10 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
         try synchronized {
             try queryLocked(
                 sql: """
-                    SELECT DISTINCT COALESCE(NULLIF(class_name, ''), primary_school_class) AS display_class
+                    SELECT DISTINCT NULLIF(class_name, '') AS display_class
                     FROM student
                     WHERE status = 'active'
-                      AND COALESCE(NULLIF(class_name, ''), primary_school_class) IS NOT NULL
+                      AND NULLIF(class_name, '') IS NOT NULL
                     ORDER BY display_class COLLATE NOCASE
                     """
             ).compactMap { text($0, "display_class") }
@@ -122,7 +127,9 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
 
     public func getStudentDetails(studentID: String) throws -> StudentDetails {
         try synchronized {
-            guard let row = try fetchStudentLocked(studentID: studentID) else {
+            guard let row = try fetchStudentLocked(studentID: studentID),
+                  let student = decodeStudent(row),
+                  student.status == "active" else {
                 throw DatabaseError.recordNotFound
             }
             let contacts = try fetchContactsLocked(studentID: studentID)
@@ -141,6 +148,110 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
                 familyAddress: text(row, "family_address"),
                 contacts: contacts.map(toPublicContact)
             )
+        }
+    }
+
+    public func addStudent(draft: StudentDraft) throws -> StudentSummary {
+        try synchronized {
+            try transactionLocked {
+                guard let name = ValueNormalizer.optionalText(draft.name) else {
+                    throw DatabaseError.invalidStudentName
+                }
+
+                let studentNumber = ValueNormalizer.optionalText(draft.studentNumber)
+                if let studentNumber {
+                    let matches = try fetchStudentRecordsLocked(studentNumber: studentNumber)
+                    if !matches.isEmpty {
+                        throw DatabaseError.duplicateStudentNumber
+                    }
+                }
+
+                let now = Self.timestamp()
+                let record = StoredStudentRecord(
+                    id: Self.opaqueIdentifier(prefix: "stu_"),
+                    className: ValueNormalizer.optionalText(draft.className),
+                    name: name,
+                    studentNumber: studentNumber,
+                    gender: ValueNormalizer.optionalText(draft.gender),
+                    idNumber: ValueNormalizer.optionalText(draft.idNumber),
+                    primarySchoolName: ValueNormalizer.optionalText(draft.primarySchoolName),
+                    primarySchoolClass: ValueNormalizer.optionalText(draft.primarySchoolClass),
+                    familyAddress: ValueNormalizer.optionalText(draft.familyAddress),
+                    status: "active",
+                    createdAt: now,
+                    updatedAt: now
+                )
+                try insertStudentLocked(record)
+                try recordStudentChangeLocked(before: nil, after: record, operation: "insert", importID: nil)
+                return StudentSummary(
+                    id: record.id,
+                    name: record.name,
+                    className: record.className,
+                    studentNumber: record.studentNumber,
+                    gender: record.gender
+                )
+            }
+        }
+    }
+
+    /// Archives a student and its active contacts in one transaction. The
+    /// records remain in the encrypted database and change history, but are
+    /// no longer shown in the active student list.
+    public func archiveStudent(studentID: String) throws {
+        try synchronized {
+            try transactionLocked {
+                guard let row = try fetchStudentLocked(studentID: studentID),
+                      let existing = decodeStudent(row),
+                      existing.status == "active" else {
+                    throw DatabaseError.recordNotFound
+                }
+
+                let archivedStudent = StoredStudentRecord(
+                    id: existing.id,
+                    className: existing.className,
+                    name: existing.name,
+                    studentNumber: existing.studentNumber,
+                    gender: existing.gender,
+                    idNumber: existing.idNumber,
+                    primarySchoolName: existing.primarySchoolName,
+                    primarySchoolClass: existing.primarySchoolClass,
+                    familyAddress: existing.familyAddress,
+                    status: "archived",
+                    createdAt: existing.createdAt,
+                    updatedAt: Self.timestamp()
+                )
+                try updateStudentLocked(archivedStudent)
+                try recordStudentChangeLocked(
+                    before: existing,
+                    after: archivedStudent,
+                    operation: "archive",
+                    importID: nil
+                )
+
+                for contact in try fetchContactsLocked(studentID: studentID) {
+                    let archivedContact = StoredContactRecord(
+                        id: contact.id,
+                        studentID: contact.studentID,
+                        name: contact.name,
+                        relation: contact.relation,
+                        phone: contact.phone,
+                        contactRole: contact.contactRole,
+                        contactOrder: contact.contactOrder,
+                        sourceColumn: contact.sourceColumn,
+                        isPrimary: contact.isPrimary,
+                        status: "archived",
+                        createdAt: contact.createdAt,
+                        updatedAt: Self.timestamp()
+                    )
+                    try updateContactLocked(archivedContact)
+                    try recordContactChangeLocked(
+                        before: contact,
+                        after: archivedContact,
+                        operation: "archive",
+                        importID: nil
+                    )
+                }
+            }
         }
     }
 
@@ -239,7 +350,9 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
     public func addParentContact(studentID: String, draft: ParentContactDraft) throws -> ParentContact {
         try synchronized {
             try transactionLocked {
-                guard try fetchStudentLocked(studentID: studentID) != nil else {
+                guard let studentRow = try fetchStudentLocked(studentID: studentID),
+                      let student = decodeStudent(studentRow),
+                      student.status == "active" else {
                     throw DatabaseError.recordNotFound
                 }
                 let normalized = try normalizedDraft(draft)

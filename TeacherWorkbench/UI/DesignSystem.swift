@@ -17,6 +17,47 @@ enum AppTheme {
     )
 }
 
+enum StudentGenderAppearance: String, Equatable {
+    case male
+    case female
+    case other
+
+    init(gender: String?) {
+        let normalized = gender?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+        if ["男", "男生", "男性", "male", "m"].contains(normalized) {
+            self = .male
+        } else if ["女", "女生", "女性", "female", "f"].contains(normalized) {
+            self = .female
+        } else {
+            self = .other
+        }
+    }
+
+    var accent: Color {
+        switch self {
+        case .male: Color(red: 0.16, green: 0.43, blue: 0.78)
+        case .female: Color(red: 0.79, green: 0.30, blue: 0.46)
+        case .other: Color(red: 0.40, green: 0.38, blue: 0.66)
+        }
+    }
+
+    var surface: Color {
+        switch self {
+        case .male: Color(red: 0.93, green: 0.96, blue: 1.0)
+        case .female: Color(red: 1.0, green: 0.94, blue: 0.96)
+        case .other: Color(red: 0.95, green: 0.94, blue: 1.0)
+        }
+    }
+
+    var heroGradient: LinearGradient {
+        LinearGradient(
+            colors: [accent.opacity(0.92), accent.opacity(0.66)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+}
+
 struct AppCard<Content: View>: View {
     private let content: Content
 

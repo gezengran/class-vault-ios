@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#183B83"/>
+      <stop offset="0.52" stop-color="#1767A8"/>
+      <stop offset="1" stop-color="#27B8AF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E9F5FF"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFD66B"/>
+      <stop offset="1" stop-color="#F1A83B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#background)"/>
+  <circle cx="154" cy="160" r="250" fill="#FFFFFF" opacity="0.08"/>
+  <circle cx="910" cy="908" r="280" fill="#082D72" opacity="0.14"/>
+
+  <path d="M258 208h430c43 0 78 35 78 78v434c0 43-35 78-78 78H258c-43 0-78-35-78-78V286c0-43 35-78 78-78Z" fill="#082D72" opacity="0.22"/>
+  <path d="M246 184h430c43 0 78 35 78 78v434c0 43-35 78-78 78H246c-43 0-78-35-78-78V262c0-43 35-78 78-78Z" fill="url(#card)"/>
+
+  <circle cx="320" cy="318" r="44" fill="#1767A8"/>
+  <path d="M260 430c0-34 27-61 61-61h0c34 0 61 27 61 61v14H260v-14Z" fill="#1767A8"/>
+  <path d="M426 300h208M426 354h155M262 526h350M262 580h278M262 634h226" stroke="#8DB6D5" stroke-width="22" stroke-linecap="round"/>
+
+  <circle cx="774" cy="746" r="137" fill="#082D72" opacity="0.25"/>
+  <circle cx="758" cy="730" r="137" fill="url(#badge)" stroke="#FFFFFF" stroke-width="14"/>
+  <path d="M714 712v-29c0-28 20-50 44-50s44 22 44 50v29" fill="none" stroke="#173B80" stroke-width="24" stroke-linecap="round"/>
+  <rect x="684" y="704" width="148" height="112" rx="24" fill="#173B80"/>
+  <circle cx="758" cy="753" r="12" fill="#FFD66B"/>
+  <path d="M758 765v22" stroke="#FFD66B" stroke-width="12" stroke-linecap="round"/>
+
+  <circle cx="812" cy="222" r="16" fill="#FFFFFF" opacity="0.78"/>
+  <circle cx="860" cy="270" r="10" fill="#FFFFFF" opacity="0.48"/>
+</svg>

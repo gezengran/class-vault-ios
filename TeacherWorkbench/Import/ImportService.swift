@@ -21,12 +21,14 @@ public struct ImportService: Sendable {
             throw ImportError.unreadableFile
         }
 
-        let table: (headers: [String], rows: [[String]], headerRowNumber: Int)
+        let table: (headers: [String], rows: [[String]], headerRowNumber: Int, tableTitle: String?)
         switch url.pathExtension.lowercased() {
         case "csv":
-            table = try CSVParser.parse(data: data)
+            let parsed = try CSVParser.parse(data: data)
+            table = parsed
         case "xlsx":
-            table = try XLSXParser.parse(data: data)
+            let parsed = try XLSXParser.parse(data: data)
+            table = parsed
         default:
             throw ImportError.unsupportedFileType
         }
@@ -36,7 +38,8 @@ public struct ImportService: Sendable {
             sourceHash: Self.sha256Hex(data),
             headers: table.headers,
             rows: table.rows,
-            headerRowNumber: table.headerRowNumber
+            headerRowNumber: table.headerRowNumber,
+            tableTitle: table.tableTitle
         )
     }
 
@@ -61,7 +64,8 @@ public struct ImportService: Sendable {
 
             let studentNumber = value(for: .studentNumber, headers: document.headers, values: values, mapping: mapping)
             let studentID = value(for: .studentID, headers: document.headers, values: values, mapping: mapping)
-            let className = value(for: .className, headers: document.headers, values: values, mapping: mapping)
+            let explicitClassName = value(for: .className, headers: document.headers, values: values, mapping: mapping)
+            let className = explicitClassName ?? document.currentClassName
             let primarySchoolClass = value(for: .primarySchoolClass, headers: document.headers, values: values, mapping: mapping)
 
             if strictMatching, studentNumber == nil {

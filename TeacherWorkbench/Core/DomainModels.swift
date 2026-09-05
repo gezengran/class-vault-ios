@@ -5,12 +5,51 @@ public struct StudentSummary: Identifiable, Codable, Hashable, Sendable {
     public let name: String
     public let className: String?
     public let studentNumber: String?
+    public let gender: String?
 
-    public init(id: String, name: String, className: String?, studentNumber: String?) {
+    public init(
+        id: String,
+        name: String,
+        className: String?,
+        studentNumber: String?,
+        gender: String? = nil
+    ) {
         self.id = id
         self.name = name
         self.className = className
         self.studentNumber = studentNumber
+        self.gender = gender
+    }
+}
+
+public struct StudentDraft: Codable, Sendable, Equatable {
+    public var name: String
+    public var className: String?
+    public var studentNumber: String?
+    public var gender: String?
+    public var idNumber: String?
+    public var primarySchoolName: String?
+    public var primarySchoolClass: String?
+    public var familyAddress: String?
+
+    public init(
+        name: String = "",
+        className: String? = nil,
+        studentNumber: String? = nil,
+        gender: String? = nil,
+        idNumber: String? = nil,
+        primarySchoolName: String? = nil,
+        primarySchoolClass: String? = nil,
+        familyAddress: String? = nil
+    ) {
+        self.name = name
+        self.className = className
+        self.studentNumber = studentNumber
+        self.gender = gender
+        self.idNumber = idNumber
+        self.primarySchoolName = primarySchoolName
+        self.primarySchoolClass = primarySchoolClass
+        self.familyAddress = familyAddress
     }
 }
 
@@ -51,7 +90,7 @@ public struct StudentDetails: Identifiable, Codable, Hashable, Sendable {
     }
 
     public var bestAvailableClassName: String? {
-        className ?? primarySchoolClass
+        className
     }
 }
 
