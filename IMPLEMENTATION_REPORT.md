@@ -19,6 +19,7 @@
 - Added UI tests for locked launch and the call confirmation dialog.
 - Updated the visible app copy to Simplified Chinese, added a generated launch screen, portrait-only target metadata, and a responsive card-based SwiftUI layout for iPhone screens.
 - Set the on-device app display name to `班匣` and reserved the private repository slug `class-vault-ios`; the internal Xcode target remains `TeacherWorkbench` for v0.1.x build and signing continuity.
+- Fixed the Swift 6/Xcode compile errors in `XLSXParser` by using an explicit optional downcast for the last import error and explicitly discarding ZIPFoundation's extraction result.
 - Added README build, test, privacy, and physical-device testing instructions.
 
 ## Verification status

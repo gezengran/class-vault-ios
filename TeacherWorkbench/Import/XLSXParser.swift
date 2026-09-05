@@ -65,8 +65,8 @@ public enum XLSXParser {
         if let fallbackTable {
             return fallbackTable
         }
-        if let lastError as ImportError {
-            throw lastError
+        if let importError = lastError as? ImportError {
+            throw importError
         }
         throw ImportError.invalidTableStructure("XLSX 文件中没有可读取的工作表。")
     }
@@ -167,7 +167,7 @@ public enum XLSXParser {
         }
         var data = Data()
         do {
-            try archive.extract(entry, consumer: { chunk in
+            _ = try archive.extract(entry, consumer: { chunk in
                 data.append(chunk)
             })
         } catch {
