@@ -1,0 +1,623 @@
+// !$*UTF8*$!
+{
+    archiveVersion = 1;
+    classes = {
+    };
+    objectVersion = 77;
+    objects = {
+
+/* Begin PBXBuildFile section */
+        A10000000000000000000101 /* TeacherWorkbenchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000201 /* TeacherWorkbenchApp.swift */; };
+        A10000000000000000000102 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000202 /* AppContainer.swift */; };
+        A10000000000000000000103 /* DomainModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000203 /* DomainModels.swift */; };
+        A10000000000000000000104 /* PhoneNumberNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000204 /* PhoneNumberNormalizer.swift */; };
+        A10000000000000000000105 /* StudentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000205 /* StudentRepository.swift */; };
+        A10000000000000000000106 /* ValueNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000206 /* ValueNormalizer.swift */; };
+        A10000000000000000000107 /* EncryptedDatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000207 /* EncryptedDatabaseService.swift */; };
+        A10000000000000000000108 /* SQLiteStudentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000208 /* SQLiteStudentRepository.swift */; };
+        A10000000000000000000109 /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000209 /* CSVParser.swift */; };
+        A10000000000000000000110 /* ImportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000210 /* ImportModels.swift */; };
+        A10000000000000000000111 /* ImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000211 /* ImportService.swift */; };
+        A10000000000000000000112 /* XLSXParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000212 /* XLSXParser.swift */; };
+        A10000000000000000000113 /* DatabaseKeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000213 /* DatabaseKeyStore.swift */; };
+        A10000000000000000000114 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000214 /* AuthenticationService.swift */; };
+        A10000000000000000000115 /* PhoneCallService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000215 /* PhoneCallService.swift */; };
+        A10000000000000000000116 /* SafeLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000216 /* SafeLogger.swift */; };
+        A10000000000000000000117 /* ContactEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000217 /* ContactEditorView.swift */; };
+        A10000000000000000000118 /* ImportPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000218 /* ImportPreviewView.swift */; };
+        A10000000000000000000119 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000219 /* RootView.swift */; };
+        A10000000000000000000120 /* StudentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000220 /* StudentDetailView.swift */; };
+        A10000000000000000000121 /* StudentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000221 /* StudentListView.swift */; };
+        A10000000000000000000122 /* ViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000222 /* ViewModels.swift */; };
+        A10000000000000000000131 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000230 /* DesignSystem.swift */; };
+        A10000000000000000000123 /* TeacherWorkbenchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000223 /* TeacherWorkbenchTests.swift */; };
+        A10000000000000000000124 /* TeacherWorkbenchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000224 /* TeacherWorkbenchUITests.swift */; };
+        A10000000000000000000125 /* SQLCipher in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000401 /* SQLCipher */; };
+        A10000000000000000000126 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000402 /* ZIPFoundation */; };
+        A10000000000000000000127 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000225 /* Security.framework */; };
+        A10000000000000000000128 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000226 /* LocalAuthentication.framework */; };
+        A10000000000000000000129 /* SQLCipher in Tests */ = {isa = PBXBuildFile; productRef = A10000000000000000000401 /* SQLCipher */; };
+        A10000000000000000000130 /* ZIPFoundation in Tests */ = {isa = PBXBuildFile; productRef = A10000000000000000000402 /* ZIPFoundation */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+        A10000000000000000000501 /* Proxy for TeacherWorkbench */ = {
+            isa = PBXContainerItemProxy;
+            containerPortal = A10000000000000000000001 /* Project object */;
+            proxyType = 1;
+            remoteGlobalIDString = A10000000000000000000301;
+            remoteInfo = TeacherWorkbench;
+        };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+        A10000000000000000000201 /* TeacherWorkbenchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeacherWorkbenchApp.swift; sourceTree = "<group>"; };
+        A10000000000000000000202 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
+        A10000000000000000000203 /* DomainModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/DomainModels.swift; sourceTree = "<group>"; };
+        A10000000000000000000204 /* PhoneNumberNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/PhoneNumberNormalizer.swift; sourceTree = "<group>"; };
+        A10000000000000000000205 /* StudentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/StudentRepository.swift; sourceTree = "<group>"; };
+        A10000000000000000000206 /* ValueNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/ValueNormalizer.swift; sourceTree = "<group>"; };
+        A10000000000000000000207 /* EncryptedDatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/EncryptedDatabaseService.swift; sourceTree = "<group>"; };
+        A10000000000000000000208 /* SQLiteStudentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/SQLiteStudentRepository.swift; sourceTree = "<group>"; };
+        A10000000000000000000209 /* CSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Import/CSVParser.swift; sourceTree = "<group>"; };
+        A10000000000000000000210 /* ImportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Import/ImportModels.swift; sourceTree = "<group>"; };
+        A10000000000000000000211 /* ImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Import/ImportService.swift; sourceTree = "<group>"; };
+        A10000000000000000000212 /* XLSXParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Import/XLSXParser.swift; sourceTree = "<group>"; };
+        A10000000000000000000213 /* DatabaseKeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/DatabaseKeyStore.swift; sourceTree = "<group>"; };
+        A10000000000000000000214 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AuthenticationService.swift; sourceTree = "<group>"; };
+        A10000000000000000000215 /* PhoneCallService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/PhoneCallService.swift; sourceTree = "<group>"; };
+        A10000000000000000000216 /* SafeLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SafeLogger.swift; sourceTree = "<group>"; };
+        A10000000000000000000217 /* ContactEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/ContactEditorView.swift; sourceTree = "<group>"; };
+        A10000000000000000000218 /* ImportPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/ImportPreviewView.swift; sourceTree = "<group>"; };
+        A10000000000000000000219 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/RootView.swift; sourceTree = "<group>"; };
+        A10000000000000000000220 /* StudentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/StudentDetailView.swift; sourceTree = "<group>"; };
+        A10000000000000000000221 /* StudentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/StudentListView.swift; sourceTree = "<group>"; };
+        A10000000000000000000222 /* ViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/ViewModels.swift; sourceTree = "<group>"; };
+        A10000000000000000000230 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/DesignSystem.swift; sourceTree = "<group>"; };
+        A10000000000000000000223 /* TeacherWorkbenchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeacherWorkbenchTests.swift; sourceTree = "<group>"; };
+        A10000000000000000000224 /* TeacherWorkbenchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeacherWorkbenchUITests.swift; sourceTree = "<group>"; };
+        A10000000000000000000225 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+        A10000000000000000000226 /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
+        A10000000000000000000227 /* TeacherWorkbench.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TeacherWorkbench.app; sourceTree = BUILT_PRODUCTS_DIR; };
+        A10000000000000000000228 /* TeacherWorkbenchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TeacherWorkbenchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+        A10000000000000000000229 /* TeacherWorkbenchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TeacherWorkbenchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+        A10000000000000000000311 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                A10000000000000000000125 /* SQLCipher in Frameworks */,
+                A10000000000000000000126 /* ZIPFoundation in Frameworks */,
+                A10000000000000000000127 /* Security.framework in Frameworks */,
+                A10000000000000000000128 /* LocalAuthentication.framework in Frameworks */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        A10000000000000000000312 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                A10000000000000000000129 /* SQLCipher in Tests */,
+                A10000000000000000000130 /* ZIPFoundation in Tests */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        A10000000000000000000313 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+        A10000000000000000000010 = {
+            isa = PBXGroup;
+            children = (
+                A10000000000000000000011 /* TeacherWorkbench */,
+                A10000000000000000000012 /* TeacherWorkbenchTests */,
+                A10000000000000000000013 /* TeacherWorkbenchUITests */,
+                A10000000000000000000014 /* Frameworks */,
+                A10000000000000000000015 /* Products */,
+            );
+            sourceTree = "<group>";
+        };
+        A10000000000000000000011 /* TeacherWorkbench */ = {
+            isa = PBXGroup;
+            children = (
+                A10000000000000000000201 /* TeacherWorkbenchApp.swift */,
+                A10000000000000000000202 /* AppContainer.swift */,
+                A10000000000000000000203 /* DomainModels.swift */,
+                A10000000000000000000204 /* PhoneNumberNormalizer.swift */,
+                A10000000000000000000205 /* StudentRepository.swift */,
+                A10000000000000000000206 /* ValueNormalizer.swift */,
+                A10000000000000000000207 /* EncryptedDatabaseService.swift */,
+                A10000000000000000000208 /* SQLiteStudentRepository.swift */,
+                A10000000000000000000209 /* CSVParser.swift */,
+                A10000000000000000000210 /* ImportModels.swift */,
+                A10000000000000000000211 /* ImportService.swift */,
+                A10000000000000000000212 /* XLSXParser.swift */,
+                A10000000000000000000213 /* DatabaseKeyStore.swift */,
+                A10000000000000000000214 /* AuthenticationService.swift */,
+                A10000000000000000000215 /* PhoneCallService.swift */,
+                A10000000000000000000216 /* SafeLogger.swift */,
+                A10000000000000000000217 /* ContactEditorView.swift */,
+                A10000000000000000000218 /* ImportPreviewView.swift */,
+                A10000000000000000000219 /* RootView.swift */,
+                A10000000000000000000220 /* StudentDetailView.swift */,
+                A10000000000000000000221 /* StudentListView.swift */,
+                A10000000000000000000222 /* ViewModels.swift */,
+                A10000000000000000000230 /* DesignSystem.swift */,
+            );
+            path = TeacherWorkbench;
+            sourceTree = "<group>";
+        };
+        A10000000000000000000012 /* TeacherWorkbenchTests */ = {
+            isa = PBXGroup;
+            children = (
+                A10000000000000000000223 /* TeacherWorkbenchTests.swift */,
+            );
+            path = TeacherWorkbenchTests;
+            sourceTree = "<group>";
+        };
+        A10000000000000000000013 /* TeacherWorkbenchUITests */ = {
+            isa = PBXGroup;
+            children = (
+                A10000000000000000000224 /* TeacherWorkbenchUITests.swift */,
+            );
+            path = TeacherWorkbenchUITests;
+            sourceTree = "<group>";
+        };
+        A10000000000000000000014 /* Frameworks */ = {
+            isa = PBXGroup;
+            children = (
+                A10000000000000000000225 /* Security.framework */,
+                A10000000000000000000226 /* LocalAuthentication.framework */,
+            );
+            name = Frameworks;
+            sourceTree = "<group>";
+        };
+        A10000000000000000000015 /* Products */ = {
+            isa = PBXGroup;
+            children = (
+                A10000000000000000000227 /* TeacherWorkbench.app */,
+                A10000000000000000000228 /* TeacherWorkbenchTests.xctest */,
+                A10000000000000000000229 /* TeacherWorkbenchUITests.xctest */,
+            );
+            name = Products;
+            sourceTree = "<group>";
+        };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+        A10000000000000000000301 /* TeacherWorkbench */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = A10000000000000000000601 /* Build configuration list for PBXNativeTarget "TeacherWorkbench" */;
+            buildPhases = (
+                A10000000000000000000321 /* Sources */,
+                A10000000000000000000311 /* Frameworks */,
+                A10000000000000000000331 /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+            );
+            name = TeacherWorkbench;
+            packageProductDependencies = (
+                A10000000000000000000401 /* SQLCipher */,
+                A10000000000000000000402 /* ZIPFoundation */,
+            );
+            productName = TeacherWorkbench;
+            productReference = A10000000000000000000227 /* TeacherWorkbench.app */;
+            productType = "com.apple.product-type.application";
+        };
+        A10000000000000000000302 /* TeacherWorkbenchTests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = A10000000000000000000602 /* Build configuration list for PBXNativeTarget "TeacherWorkbenchTests" */;
+            buildPhases = (
+                A10000000000000000000322 /* Sources */,
+                A10000000000000000000312 /* Frameworks */,
+                A10000000000000000000332 /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+                A10000000000000000000502 /* PBXTargetDependency */,
+            );
+            name = TeacherWorkbenchTests;
+            packageProductDependencies = (
+                A10000000000000000000401 /* SQLCipher */,
+                A10000000000000000000402 /* ZIPFoundation */,
+            );
+            productName = TeacherWorkbenchTests;
+            productReference = A10000000000000000000228 /* TeacherWorkbenchTests.xctest */;
+            productType = "com.apple.product-type.bundle.unit-test";
+        };
+        A10000000000000000000303 /* TeacherWorkbenchUITests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = A10000000000000000000603 /* Build configuration list for PBXNativeTarget "TeacherWorkbenchUITests" */;
+            buildPhases = (
+                A10000000000000000000323 /* Sources */,
+                A10000000000000000000313 /* Frameworks */,
+                A10000000000000000000333 /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+                A10000000000000000000503 /* PBXTargetDependency */,
+            );
+            name = TeacherWorkbenchUITests;
+            packageProductDependencies = (
+            );
+            productName = TeacherWorkbenchUITests;
+            productReference = A10000000000000000000229 /* TeacherWorkbenchUITests.xctest */;
+            productType = "com.apple.product-type.bundle.ui-testing";
+        };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+        A10000000000000000000001 /* Project object */ = {
+            isa = PBXProject;
+            attributes = {
+                LastUpgradeCheck = 1600;
+                ORGANIZATIONNAME = "Teacher Workbench";
+                TargetAttributes = {
+                    A10000000000000000000301 = {
+                        CreatedOnToolsVersion = 16.0;
+                    };
+                    A10000000000000000000302 = {
+                        CreatedOnToolsVersion = 16.0;
+                        TestTargetID = A10000000000000000000301;
+                    };
+                    A10000000000000000000303 = {
+                        CreatedOnToolsVersion = 16.0;
+                        TestTargetID = A10000000000000000000301;
+                    };
+                };
+            };
+            buildConfigurationList = A10000000000000000000600 /* Build configuration list for PBXProject "TeacherWorkbench" */;
+            compatibilityVersion = "Xcode 16.0";
+            developmentRegion = "zh-Hans";
+            hasScannedForEncodings = 0;
+            knownRegions = (
+                en,
+                "zh-Hans",
+                Base,
+            );
+            mainGroup = A10000000000000000000010;
+            packageReferences = (
+                A10000000000000000000411 /* SQLCipher.swift */,
+                A10000000000000000000412 /* ZIPFoundation */,
+            );
+            productRefGroup = A10000000000000000000015 /* Products */;
+            projectDirPath = "";
+            projectRoot = "";
+            targets = (
+                A10000000000000000000301 /* TeacherWorkbench */,
+                A10000000000000000000302 /* TeacherWorkbenchTests */,
+                A10000000000000000000303 /* TeacherWorkbenchUITests */,
+            );
+        };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+        A10000000000000000000331 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+        A10000000000000000000332 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+        A10000000000000000000333 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+        A10000000000000000000321 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                A10000000000000000000101 /* TeacherWorkbenchApp.swift in Sources */,
+                A10000000000000000000102 /* AppContainer.swift in Sources */,
+                A10000000000000000000103 /* DomainModels.swift in Sources */,
+                A10000000000000000000104 /* PhoneNumberNormalizer.swift in Sources */,
+                A10000000000000000000105 /* StudentRepository.swift in Sources */,
+                A10000000000000000000106 /* ValueNormalizer.swift in Sources */,
+                A10000000000000000000107 /* EncryptedDatabaseService.swift in Sources */,
+                A10000000000000000000108 /* SQLiteStudentRepository.swift in Sources */,
+                A10000000000000000000109 /* CSVParser.swift in Sources */,
+                A10000000000000000000110 /* ImportModels.swift in Sources */,
+                A10000000000000000000111 /* ImportService.swift in Sources */,
+                A10000000000000000000112 /* XLSXParser.swift in Sources */,
+                A10000000000000000000113 /* DatabaseKeyStore.swift in Sources */,
+                A10000000000000000000114 /* AuthenticationService.swift in Sources */,
+                A10000000000000000000115 /* PhoneCallService.swift in Sources */,
+                A10000000000000000000116 /* SafeLogger.swift in Sources */,
+                A10000000000000000000117 /* ContactEditorView.swift in Sources */,
+                A10000000000000000000118 /* ImportPreviewView.swift in Sources */,
+                A10000000000000000000119 /* RootView.swift in Sources */,
+                A10000000000000000000120 /* StudentDetailView.swift in Sources */,
+                A10000000000000000000121 /* StudentListView.swift in Sources */,
+                A10000000000000000000122 /* ViewModels.swift in Sources */,
+                A10000000000000000000131 /* DesignSystem.swift in Sources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        A10000000000000000000322 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                A10000000000000000000123 /* TeacherWorkbenchTests.swift in Sources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        A10000000000000000000323 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                A10000000000000000000124 /* TeacherWorkbenchUITests.swift in Sources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+        A10000000000000000000502 /* PBXTargetDependency */ = {
+            isa = PBXTargetDependency;
+            target = A10000000000000000000301 /* TeacherWorkbench */;
+            targetProxy = A10000000000000000000501 /* Proxy for TeacherWorkbench */;
+        };
+        A10000000000000000000503 /* PBXTargetDependency */ = {
+            isa = PBXTargetDependency;
+            target = A10000000000000000000301 /* TeacherWorkbench */;
+            targetProxy = A10000000000000000000501 /* Proxy for TeacherWorkbench */;
+        };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+        A10000000000000000000701 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CLANG_ENABLE_MODULES = YES;
+                CLANG_ENABLE_OBJC_ARC = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                SWIFT_VERSION = 6.0;
+            };
+            name = Debug;
+        };
+        A10000000000000000000702 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CLANG_ENABLE_MODULES = YES;
+                CLANG_ENABLE_OBJC_ARC = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                SWIFT_VERSION = 6.0;
+            };
+            name = Release;
+        };
+        A10000000000000000000801 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = "";
+                ENABLE_TESTABILITY = YES;
+                ENABLE_PREVIEWS = YES;
+                GENERATE_INFOPLIST_FILE = YES;
+                INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
+                INFOPLIST_KEY_CFBundleDisplayName = "学生通讯录";
+                INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+                INFOPLIST_KEY_NSFaceIDUsageDescription = "使用 Face ID 或设备密码解锁本机保存的学生联系人。";
+                INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                GCC_PREPROCESSOR_DEFINITIONS = (
+                    "$(inherited)",
+                    "SQLITE_HAS_CODEC=1",
+                );
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.TeacherWorkbench;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+                SWIFT_EMIT_LOC_STRINGS = YES;
+                SWIFT_STRICT_CONCURRENCY = minimal;
+                SWIFT_VERSION = 6.0;
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Debug;
+        };
+        A10000000000000000000802 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
+                INFOPLIST_KEY_CFBundleDisplayName = "学生通讯录";
+                INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+                INFOPLIST_KEY_NSFaceIDUsageDescription = "使用 Face ID 或设备密码解锁本机保存的学生联系人。";
+                INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                GCC_PREPROCESSOR_DEFINITIONS = (
+                    "$(inherited)",
+                    "SQLITE_HAS_CODEC=1",
+                );
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.TeacherWorkbench;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_STRICT_CONCURRENCY = minimal;
+                SWIFT_VERSION = 6.0;
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Release;
+        };
+        A10000000000000000000901 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                GCC_PREPROCESSOR_DEFINITIONS = (
+                    "$(inherited)",
+                    "SQLITE_HAS_CODEC=1",
+                );
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                    "@loader_path/Frameworks",
+                );
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.TeacherWorkbenchTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+                SWIFT_STRICT_CONCURRENCY = minimal;
+                SWIFT_VERSION = 6.0;
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TeacherWorkbench.app/TeacherWorkbench";
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Debug;
+        };
+        A10000000000000000000902 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                GCC_PREPROCESSOR_DEFINITIONS = (
+                    "$(inherited)",
+                    "SQLITE_HAS_CODEC=1",
+                );
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                    "@loader_path/Frameworks",
+                );
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.TeacherWorkbenchTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_STRICT_CONCURRENCY = minimal;
+                SWIFT_VERSION = 6.0;
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TeacherWorkbench.app/TeacherWorkbench";
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Release;
+        };
+        A10000000000000000000903 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.TeacherWorkbenchUITests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+                SWIFT_STRICT_CONCURRENCY = minimal;
+                SWIFT_VERSION = 6.0;
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Debug;
+        };
+        A10000000000000000000904 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.TeacherWorkbenchUITests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_STRICT_CONCURRENCY = minimal;
+                SWIFT_VERSION = 6.0;
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Release;
+        };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+        A10000000000000000000600 /* Build configuration list for PBXProject "TeacherWorkbench" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                A10000000000000000000701 /* Debug */,
+                A10000000000000000000702 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        A10000000000000000000601 /* Build configuration list for PBXNativeTarget "TeacherWorkbench" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                A10000000000000000000801 /* Debug */,
+                A10000000000000000000802 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        A10000000000000000000602 /* Build configuration list for PBXNativeTarget "TeacherWorkbenchTests" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                A10000000000000000000901 /* Debug */,
+                A10000000000000000000902 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        A10000000000000000000603 /* Build configuration list for PBXNativeTarget "TeacherWorkbenchUITests" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                A10000000000000000000903 /* Debug */,
+                A10000000000000000000904 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+        A10000000000000000000411 /* XCRemoteSwiftPackageReference "SQLCipher.swift" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/sqlcipher/SQLCipher.swift.git";
+            requirement = {
+                kind = exactVersion;
+                version = 4.18.0;
+            };
+        };
+        A10000000000000000000412 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+            requirement = {
+                kind = exactVersion;
+                version = 0.9.20;
+            };
+        };
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+        A10000000000000000000401 /* SQLCipher */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = A10000000000000000000411 /* SQLCipher.swift */;
+            productName = SQLCipher;
+        };
+        A10000000000000000000402 /* ZIPFoundation */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = A10000000000000000000412 /* ZIPFoundation */;
+            productName = ZIPFoundation;
+        };
+/* End XCSwiftPackageProductDependency section */
+    };
+    rootObject = A10000000000000000000001 /* Project object */;
+}
