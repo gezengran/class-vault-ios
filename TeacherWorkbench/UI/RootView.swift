@@ -62,7 +62,7 @@ struct LockView: View {
                             .frame(width: 88, height: 88)
                             .background(.white.opacity(0.16), in: Circle())
 
-                        Text("学生通讯录")
+                        Text("班匣")
                             .font(.system(size: 34, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
 

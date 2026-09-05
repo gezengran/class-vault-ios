@@ -1,6 +1,8 @@
-# Teacher Workbench — iPhone Student Contact MVP
+# 班匣（ClassVault）— iPhone Student Contact MVP
 
-Teacher Workbench is a personal, offline-first SwiftUI application for a teacher who needs a private local student/contact directory.
+班匣（ClassVault）is a personal, offline-first SwiftUI application for a teacher who needs a private local student/contact directory.
+
+The private GitHub repository uses the slug `class-vault-ios`. The app's on-device display name is `班匣`; the existing Xcode project and target identifiers remain `TeacherWorkbench` in v0.1.x to preserve package, test-host, and signing continuity.
 
 ## Build requirements
 
@@ -97,7 +99,7 @@ Use synthetic data until the full import, edit, re-import, lock, and call flow p
 
 ## Version 0.1.2 fixes
 
-- The app's visible copy and generated display name are Simplified Chinese by default.
+- The app's visible copy and generated display name are Simplified Chinese by default; the on-device app name is `班匣`.
 - The app target has generated launch-screen metadata and portrait-only orientation settings so a current iPhone uses the full screen instead of a legacy letterboxed layout.
 - XLSX import now resolves standard workbook relationships, handles common namespace/path variations, searches the first 20 worksheet rows for the real header, and prefers a student-like worksheet when a workbook contains a cover sheet. It supports shared strings, inline strings, booleans, and cached cell values.
 

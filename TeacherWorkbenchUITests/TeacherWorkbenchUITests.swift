@@ -7,7 +7,7 @@ final class TeacherWorkbenchUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(app.otherElements["lock-screen"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["学生通讯录"].exists)
+        XCTAssertTrue(app.staticTexts["班匣"].exists)
         XCTAssertFalse(app.staticTexts["Synthetic Student"].exists)
         XCTAssertFalse(app.staticTexts["Synthetic Parent"].exists)
     }

@@ -1,4 +1,4 @@
-# Implementation report — Teacher Workbench MVP 0.1
+# Implementation report — 班匣（ClassVault）MVP 0.1
 
 ## Completed
 
@@ -18,6 +18,7 @@
 - Added unit tests for schema initialization, incorrect-key failure, opaque-ID insertion, CSV/XLSX import mapping, title-row/header-row detection, phone normalization, duplicate/invalid input, search, manual contact editing, safe re-import, archiving, change events, database-dependent contact-ID conflicts, cancel-before-commit behavior, and log privacy.
 - Added UI tests for locked launch and the call confirmation dialog.
 - Updated the visible app copy to Simplified Chinese, added a generated launch screen, portrait-only target metadata, and a responsive card-based SwiftUI layout for iPhone screens.
+- Set the on-device app display name to `班匣` and reserved the private repository slug `class-vault-ios`; the internal Xcode target remains `TeacherWorkbench` for v0.1.x build and signing continuity.
 - Added README build, test, privacy, and physical-device testing instructions.
 
 ## Verification status

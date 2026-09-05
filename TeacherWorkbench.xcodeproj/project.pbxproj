@@ -403,7 +403,7 @@
                 ENABLE_PREVIEWS = YES;
                 GENERATE_INFOPLIST_FILE = YES;
                 INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
-                INFOPLIST_KEY_CFBundleDisplayName = "学生通讯录";
+                INFOPLIST_KEY_CFBundleDisplayName = "班匣";
                 INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
                 INFOPLIST_KEY_NSFaceIDUsageDescription = "使用 Face ID 或设备密码解锁本机保存的学生联系人。";
                 INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -436,7 +436,7 @@
                 DEVELOPMENT_TEAM = "";
                 GENERATE_INFOPLIST_FILE = YES;
                 INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
-                INFOPLIST_KEY_CFBundleDisplayName = "学生通讯录";
+                INFOPLIST_KEY_CFBundleDisplayName = "班匣";
                 INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
                 INFOPLIST_KEY_NSFaceIDUsageDescription = "使用 Face ID 或设备密码解锁本机保存的学生联系人。";
                 INFOPLIST_KEY_UILaunchScreen_Generation = YES;
