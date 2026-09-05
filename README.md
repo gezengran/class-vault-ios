@@ -2,7 +2,7 @@
 
 班匣（ClassVault）is a personal, offline-first SwiftUI application for a teacher who needs a private local student/contact directory.
 
-The private GitHub repository uses the slug `class-vault-ios`. The app's on-device display name is `班匣`; the existing Xcode project and target identifiers remain `TeacherWorkbench` in v0.1.x to preserve package, test-host, and signing continuity.
+The intended private GitHub repository uses the slug `class-vault-ios`. The app's on-device display name is `班匣`; the existing Xcode project and target identifiers remain `TeacherWorkbench` in v0.1.x to preserve package, test-host, and signing continuity.
 
 ## Build requirements
 
