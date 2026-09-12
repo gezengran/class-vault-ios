@@ -21,18 +21,23 @@
 - Set the on-device app display name to `班匣` and reserved the private repository slug `class-vault-ios`; the internal Xcode target remains `TeacherWorkbench` for v0.1.x build and signing continuity.
 - Fixed the Swift 6/Xcode compile errors in `XLSXParser` by using an explicit optional downcast for the last import error and explicitly discarding ZIPFoundation's extraction result.
 - Added README build, test, privacy, and physical-device testing instructions.
+- Added a dedicated data portability layer: versioned `.classvaultbackup` packages with independent password-derived SQLCipher encryption, manifest inspection, temporary validation, safe restore with a pre-restore copy, and explicit unknown-component reporting.
+- Added domain-level CSV, XLSX, and JSON export for students, contacts, and the current complete dataset. Plaintext export is isolated from SQL/table details and the UI warns before writing readable private data.
+- Added the Data & Privacy screen with backup/restore, export format selection, backup reminder state, cloud-sync-off disclosure, and privacy/accessibility copy.
+- Added attachment metadata and `BackupComponentProvider` boundaries so future modules can participate without coupling portability to live SQLite tables.
 
 ## Verification status
 
-The implementation was statically reviewed in this workspace. The workspace is Linux-only and does not contain Xcode, an iOS SDK, or a Swift compiler, so `xcodebuild test` could not be run here. The first macOS/Xcode pass should resolve the packages, compile the project, and run the complete test scheme.
+The app builds successfully with the installed Xcode toolchain and cached package artifacts, and the unit-test target passes on the iPhone simulator. The UI-test target remains environment-dependent in this workspace because simulator diagnostic collection reports that `simctl` is unavailable; run the UI tests from Xcode on a normal macOS development setup.
 
 ## Known limitations
 
-1. XLSX import reads cached cell values and selects a recognizable student worksheet. Formula evaluation, multi-sheet joins, merged-cell interpretation, and advanced Excel formatting are outside version 0.1.
+1. XLSX import reads cached cell values and selects a recognizable student worksheet. Formula evaluation, multi-sheet joins, merged-cell interpretation, and advanced Excel formatting are outside version 0.1. XLSX export intentionally emits a simple single-sheet domain workbook.
 2. The current project uses the example bundle identifier `com.example.TeacherWorkbench`; signing team and production bundle identity must be configured by the app owner.
 3. The database key is intentionally device-bound and not recoverable after the Keychain item is lost.
 4. The default import preview has strict student-number matching disabled. The user can enable it before commit.
 5. UI testing uses synthetic Debug-only data and launch arguments. Final call behavior must be checked on a physical iPhone.
+6. Backup format v1 packages the encrypted core database; attachment binary packaging, grades, and other future module providers are reserved but not yet implemented.
 
 ## Decisions requiring confirmation
 

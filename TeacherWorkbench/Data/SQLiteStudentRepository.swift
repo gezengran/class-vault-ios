@@ -1,6 +1,6 @@
 import Foundation
 
-public final class SQLiteStudentRepository: StudentRepository, @unchecked Sendable {
+public final class SQLiteStudentRepository: StudentRepository, DataExportSource, @unchecked Sendable {
     let database: EncryptedDatabaseService
     let importService: ImportService
 
@@ -28,6 +28,14 @@ public final class SQLiteStudentRepository: StudentRepository, @unchecked Sendab
 
     public func getStudentDetails(studentID: String) throws -> StudentDetails {
         try database.getStudentDetails(studentID: studentID)
+    }
+
+    public func studentDetailsForExport(filters: ExportFilters) throws -> [StudentDetails] {
+        try database.studentDetailsForExport(filters: filters)
+    }
+
+    public var dataPortabilityService: DataPortabilityService {
+        DataPortabilityService(database: database, exportSource: self)
     }
 
     public func addStudent(draft: StudentDraft) throws -> StudentSummary {

@@ -75,6 +75,151 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
         try synchronized { try scalarTextLocked(sql: "PRAGMA cipher_version;") }
     }
 
+    public func databaseSchemaVersion() throws -> Int {
+        try synchronized { Int(try scalarIntegerLocked(sql: "PRAGMA user_version") ?? 0) }
+    }
+
+    /// Returns domain records for external export. SQL remains confined to
+    /// this service; callers never need to know table names.
+    public func studentDetailsForExport(filters: ExportFilters) throws -> [StudentDetails] {
+        try synchronized {
+            var sql = """
+                SELECT student_id, class_name, name, student_number, gender,
+                       id_number, primary_school_name, primary_school_class,
+                       family_address, status, created_at, updated_at
+                FROM student
+                WHERE 1 = 1
+                """
+            var arguments: [SQLiteValue] = []
+
+            if !filters.includeArchived {
+                sql += " AND status = 'active'"
+            }
+            if let className = ValueNormalizer.optionalText(filters.className) {
+                sql += " AND NULLIF(class_name, '') = ?"
+                arguments.append(.text(className))
+            }
+            if !filters.studentIDs.isEmpty {
+                let sortedIDs = filters.studentIDs.sorted()
+                sql += " AND student_id IN (\(sortedIDs.map { _ in "?" }.joined(separator: ",")))"
+                arguments.append(contentsOf: sortedIDs.map { .text($0) })
+            }
+            sql += " ORDER BY name COLLATE NOCASE, student_id"
+
+            return try queryLocked(sql: sql, arguments: arguments).compactMap { row in
+                guard let student = decodeStudent(row) else { return nil }
+                let contacts = try fetchContactsLocked(
+                    studentID: student.id,
+                    includeArchived: filters.includeArchived
+                )
+                return StudentDetails(
+                    id: student.id,
+                    name: student.name,
+                    className: student.className,
+                    studentNumber: student.studentNumber,
+                    gender: student.gender,
+                    idNumber: student.idNumber,
+                    primarySchoolName: student.primarySchoolName,
+                    primarySchoolClass: student.primarySchoolClass,
+                    familyAddress: student.familyAddress,
+                    contacts: contacts.map(toPublicContact)
+                )
+            }
+        }
+    }
+
+    /// Creates a logically consistent SQLCipher snapshot encrypted with the
+    /// supplied key. The portability layer supplies a password-derived key
+    /// for backups and the device key when re-keying a restored database.
+    public func createEncryptedSnapshot(to destinationURL: URL, encryptionKey: Data) throws {
+        guard encryptionKey.count == 32 else { throw DatabaseError.keyRejected }
+        try synchronized {
+            let directory = destinationURL.deletingLastPathComponent()
+            try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                try fileManager.removeItem(at: destinationURL)
+            }
+
+            var isAttached = false
+            do {
+                try executeLocked(
+                    // Bind the raw key as a BLOB. Passing x'...' as a bound
+                    // string would make the literal characters part of the
+                    // key instead of using the supplied 32 bytes.
+                    sql: "ATTACH DATABASE ? AS portability_backup KEY ?",
+                    arguments: [.text(destinationURL.path), .blob(encryptionKey)]
+                )
+                isAttached = true
+                _ = try queryLocked(sql: "SELECT sqlcipher_export('portability_backup')")
+                try executeLocked(sql: "DETACH DATABASE portability_backup")
+                isAttached = false
+                try? fileManager.setAttributes(
+                    [.protectionKey: FileProtectionType.complete],
+                    ofItemAtPath: destinationURL.path
+                )
+            } catch {
+                if isAttached { try? executeLocked(sql: "DETACH DATABASE portability_backup") }
+                try? fileManager.removeItem(at: destinationURL)
+                throw error
+            }
+        }
+    }
+
+    /// Returns a safety-copy URL after replacing the live database. The
+    /// incoming snapshot must already be encrypted with the device key.
+    @discardableResult
+    public func replaceDatabase(with snapshotURL: URL) throws -> URL {
+        try synchronized {
+            guard fileManager.fileExists(atPath: snapshotURL.path) else {
+                throw DatabaseError.databaseFailure(operation: "restore_missing_snapshot", code: SQLITE_NOTFOUND)
+            }
+
+            let safetyCopyURL = databaseURL.deletingLastPathComponent()
+                .appendingPathComponent("teacher_workbench.pre-restore-\(UUID().uuidString).sqlite")
+            closeLocked()
+
+            do {
+                try fileManager.copyItem(at: databaseURL, to: safetyCopyURL)
+                do {
+                    try fileManager.removeItem(at: databaseURL)
+                    try fileManager.moveItem(at: snapshotURL, to: databaseURL)
+                } catch {
+                    if !fileManager.fileExists(atPath: databaseURL.path) {
+                        try? fileManager.moveItem(at: safetyCopyURL, to: databaseURL)
+                    }
+                    throw error
+                }
+                do {
+                    try openAndMigrateLocked()
+                } catch {
+                    try? fileManager.removeItem(at: databaseURL)
+                    try? fileManager.moveItem(at: safetyCopyURL, to: databaseURL)
+                    try? openAndMigrateLocked()
+                    throw error
+                }
+                return safetyCopyURL
+            } catch {
+                if database == nil {
+                    try? openAndMigrateLocked()
+                }
+                throw error
+            }
+        }
+    }
+
+    func currentKeyForPortability() throws -> Data {
+        try keyStore.loadOrCreateKey()
+    }
+
+    func portabilityRecordCounts() throws -> (students: Int, contacts: Int) {
+        try synchronized {
+            (
+                Int(try scalarIntegerLocked(sql: "SELECT COUNT(*) FROM student") ?? 0),
+                Int(try scalarIntegerLocked(sql: "SELECT COUNT(*) FROM parent_contact") ?? 0)
+            )
+        }
+    }
+
     public func listStudents(search: String?, className: String?) throws -> [StudentSummary] {
         try synchronized {
             var sql = """
@@ -318,7 +463,7 @@ public final class EncryptedDatabaseService: @unchecked Sendable {
     /// Read-only preflight for conflicts that depend on the existing local
     /// database. No data is changed by this method.
     public func preflightImport(_ rows: [NormalizedImportRow]) throws -> [ImportIssue] {
-        try synchronized {
+        synchronized {
             var issues: [ImportIssue] = []
             for row in rows {
                 do {
@@ -627,53 +772,63 @@ private extension EncryptedDatabaseService {
     }
 
     func openAndMigrate() throws {
-        try synchronized {
-            let directory = databaseURL.deletingLastPathComponent()
-            try fileManager.createDirectory(
-                at: directory,
-                withIntermediateDirectories: true,
-                attributes: [.protectionKey: FileProtectionType.complete]
+        try synchronized { try openAndMigrateLocked() }
+    }
+
+    func openAndMigrateLocked() throws {
+        let directory = databaseURL.deletingLastPathComponent()
+        try fileManager.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true,
+            attributes: [.protectionKey: FileProtectionType.complete]
+        )
+
+        var handle: OpaquePointer?
+        let openCode = databaseURL.path.withCString { path in
+            sqlite3_open_v2(
+                path,
+                &handle,
+                SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX,
+                nil
             )
-
-            var handle: OpaquePointer?
-            let openCode = databaseURL.path.withCString { path in
-                sqlite3_open_v2(
-                    path,
-                    &handle,
-                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX,
-                    nil
-                )
-            }
-            guard openCode == SQLITE_OK, let handle else {
-                if let handle { sqlite3_close(handle) }
-                throw DatabaseError.openFailed(openCode)
-            }
-            database = handle
-
-            do {
-                let key = try keyStore.loadOrCreateKey()
-                let keyCode = key.withUnsafeBytes { bytes in
-                    sqlite3_key(handle, bytes.baseAddress, Int32(key.count))
-                }
-                guard keyCode == SQLITE_OK else { throw DatabaseError.keyRejected }
-
-                try executeLocked(sql: "PRAGMA foreign_keys = ON;")
-                try executeLocked(sql: "PRAGMA cipher_memory_security = ON;")
-                guard try scalarTextLocked(sql: "PRAGMA cipher_version;") != nil else {
-                    throw DatabaseError.sqlCipherUnavailable
-                }
-                _ = try scalarIntegerLocked(sql: "SELECT COUNT(*) FROM sqlite_master")
-                try migrateLocked()
-                try fileManager.setAttributes(
-                    [.protectionKey: FileProtectionType.complete],
-                    ofItemAtPath: databaseURL.path
-                )
-                logger.record(operation: "database_open")
-            } catch {
-                closeLocked()
-                throw error
-            }
         }
+        guard openCode == SQLITE_OK, let handle else {
+            if let handle { sqlite3_close(handle) }
+            throw DatabaseError.openFailed(openCode)
+        }
+        database = handle
+
+        do {
+            let key = try keyStore.loadOrCreateKey()
+            let keyCode = key.withUnsafeBytes { bytes in
+                sqlite3_key(handle, bytes.baseAddress, Int32(key.count))
+            }
+            guard keyCode == SQLITE_OK else { throw DatabaseError.keyRejected }
+
+            try executeLocked(sql: "PRAGMA foreign_keys = ON;")
+            try executeLocked(sql: "PRAGMA cipher_memory_security = ON;")
+            guard try scalarTextLocked(sql: "PRAGMA cipher_version;") != nil else {
+                throw DatabaseError.sqlCipherUnavailable
+            }
+            _ = try scalarIntegerLocked(sql: "SELECT COUNT(*) FROM sqlite_master")
+            try migrateLocked()
+            try fileManager.setAttributes(
+                [.protectionKey: FileProtectionType.complete],
+                ofItemAtPath: databaseURL.path
+            )
+            excludeFromAutomaticBackup(at: directory)
+            excludeFromAutomaticBackup(at: databaseURL)
+        } catch {
+            closeLocked()
+            throw error
+        }
+    }
+
+    func excludeFromAutomaticBackup(at url: URL) {
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        var securedURL = url
+        try? securedURL.setResourceValues(values)
     }
 
     func migrateLocked() throws {
@@ -892,9 +1047,10 @@ private extension EncryptedDatabaseService {
         )
     }
 
-    func fetchContactsLocked(studentID: String) throws -> [StoredContactRecord] {
-        try queryLocked(
-            sql: "SELECT parent_id, student_id, parent_name, relation, phone, contact_role, contact_order, source_column, is_primary, status, created_at, updated_at FROM parent_contact WHERE student_id = ? AND status = 'active' ORDER BY is_primary DESC, CASE WHEN contact_order IS NULL THEN 999999 ELSE contact_order END, created_at",
+    func fetchContactsLocked(studentID: String, includeArchived: Bool = false) throws -> [StoredContactRecord] {
+        let statusClause = includeArchived ? "" : " AND status = 'active'"
+        return try queryLocked(
+            sql: "SELECT parent_id, student_id, parent_name, relation, phone, contact_role, contact_order, source_column, is_primary, status, created_at, updated_at FROM parent_contact WHERE student_id = ?\(statusClause) ORDER BY is_primary DESC, CASE WHEN contact_order IS NULL THEN 999999 ELSE contact_order END, created_at",
             arguments: [.text(studentID)]
         ).compactMap(decodeContact)
     }

@@ -11,7 +11,10 @@ struct RootView: View {
             } else if !container.isUnlocked {
                 LockView()
             } else if let repository = container.repository {
-                StudentListView(repository: repository)
+                StudentListView(
+                    repository: repository,
+                    portabilityService: repository.dataPortabilityService
+                )
             } else {
                 StartupErrorView(message: "本地加密存储无法初始化。")
             }

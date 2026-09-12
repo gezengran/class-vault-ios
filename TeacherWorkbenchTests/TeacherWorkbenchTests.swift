@@ -411,6 +411,115 @@ final class TeacherWorkbenchTests: XCTestCase {
         XCTAssertTrue(output.contains("operation=import_commit"))
     }
 
+    func testRecoveryBackupHasIndependentPasswordEncryptionAndVersionedManifest() throws {
+        try withRepository { repository, _ in
+            let csv = """
+            学号,姓名,班级,联系方式一
+            SYN-001,Synthetic Student,初一（8）班,13800000000
+            """
+            let importURL = try writeSyntheticCSV(csv)
+            defer { try? FileManager.default.removeItem(at: importURL) }
+            _ = try repository.commitImport(repository.previewImport(importURL, strictMatching: false))
+
+            let backupURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent("ClassVaultBackup-\(UUID().uuidString).classvaultbackup")
+            defer { try? FileManager.default.removeItem(at: backupURL) }
+
+            let service = repository.dataPortabilityService.backup
+            let backup = try service.createBackup(destination: backupURL, password: "correct horse")
+            XCTAssertEqual(backup.metadata.backupFormat, "classvault-backup")
+            XCTAssertEqual(backup.metadata.formatVersion, 1)
+            XCTAssertEqual(backup.metadata.databaseSchemaVersion, 1)
+            XCTAssertEqual(backup.metadata.content.modules, [.students, .contacts])
+
+            let bytes = try Data(contentsOf: backupURL)
+            XCTAssertFalse(String(decoding: bytes, as: UTF8.self).contains("Synthetic Student"))
+            XCTAssertThrowsError(
+                try service.validateBackup(at: backupURL, password: "wrong password")
+            ) { error in
+                XCTAssertEqual(error as? BackupError, .wrongPassword)
+            }
+
+            let validation = try service.validateBackup(at: backupURL, password: "correct horse")
+            XCTAssertTrue(validation.isValid)
+            XCTAssertEqual(validation.studentCount, 1)
+            XCTAssertEqual(validation.contactCount, 1)
+        }
+    }
+
+    func testRestoreReplacesDataOnlyAfterValidationAndPreservesStableIDs() throws {
+        try withRepository { repository, _ in
+            let originalCSV = """
+            学号,姓名,联系方式一
+            SYN-001,Synthetic Student,13800000000
+            """
+            let originalURL = try writeSyntheticCSV(originalCSV)
+            defer { try? FileManager.default.removeItem(at: originalURL) }
+            _ = try repository.commitImport(repository.previewImport(originalURL, strictMatching: false))
+            let originalStudent = try XCTUnwrap(repository.listStudents(search: "SYN-001", className: nil).first)
+            let originalContact = try XCTUnwrap(repository.getStudentDetails(studentID: originalStudent.id).contacts.first)
+
+            let backupURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent("ClassVaultRestore-\(UUID().uuidString).classvaultbackup")
+            defer { try? FileManager.default.removeItem(at: backupURL) }
+            _ = try repository.dataPortabilityService.backup.createBackup(
+                destination: backupURL,
+                password: "correct horse"
+            )
+
+            _ = try repository.addStudent(draft: StudentDraft(name: "Temporary Student", studentNumber: "TEMP-001"))
+            let result = try repository.dataPortabilityService.backup.restoreBackup(
+                from: backupURL,
+                password: "correct horse",
+                mode: .replaceCurrentData
+            )
+
+            XCTAssertTrue(FileManager.default.fileExists(atPath: result.safetyCopyURL.path))
+            XCTAssertEqual(try repository.listStudents(search: "Temporary Student", className: nil).count, 0)
+            let restoredStudent = try XCTUnwrap(repository.listStudents(search: "SYN-001", className: nil).first)
+            XCTAssertEqual(restoredStudent.id, originalStudent.id)
+            let restoredContact = try XCTUnwrap(repository.getStudentDetails(studentID: restoredStudent.id).contacts.first)
+            XCTAssertEqual(restoredContact.id, originalContact.id)
+        }
+    }
+
+    func testDomainExportsDoNotIncludeInternalHistoryOrKeyMaterial() throws {
+        try withRepository { repository, _ in
+            let csv = """
+            学号,姓名,班级,联系方式一
+            SYN-001,Synthetic Student,初一（8）班,13800000000
+            """
+            let importURL = try writeSyntheticCSV(csv)
+            defer { try? FileManager.default.removeItem(at: importURL) }
+            _ = try repository.commitImport(repository.previewImport(importURL, strictMatching: false))
+
+            let service = repository.dataPortabilityService.export
+            for format in ExportFormat.allCases {
+                let outputURL = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("ClassVaultExport-\(UUID().uuidString).\(format.fileExtension)")
+                defer { try? FileManager.default.removeItem(at: outputURL) }
+                let result = try service.exportDataset(
+                    request: DatasetExportRequest(
+                        modules: [.students, .contacts],
+                        format: format
+                    ),
+                    destination: outputURL
+                )
+                XCTAssertGreaterThan(result.rowCount, 0)
+                let data = try Data(contentsOf: outputURL)
+                if format != .xlsx {
+                    let text = String(decoding: data, as: UTF8.self)
+                    XCTAssertTrue(text.contains("stu_"))
+                    XCTAssertTrue(text.contains("Synthetic Student"))
+                    XCTAssertFalse(text.contains("change_event"))
+                    XCTAssertFalse(text.contains("sqlcipher-database-key"))
+                } else {
+                    XCTAssertEqual(Array(data.prefix(2)), [0x50, 0x4B])
+                }
+            }
+        }
+    }
+
     private func withDatabase(_ body: (EncryptedDatabaseService, URL) throws -> Void) throws {
         let url = temporaryDatabaseURL()
         do {

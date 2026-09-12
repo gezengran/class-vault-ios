@@ -91,7 +91,6 @@ public final class KeychainDatabaseKeyStore: DatabaseKeyStore, @unchecked Sendab
     }
 }
 
-#if DEBUG
 public final class FixedDatabaseKeyStore: DatabaseKeyStore, @unchecked Sendable {
     private let key: Data
 
@@ -101,4 +100,3 @@ public final class FixedDatabaseKeyStore: DatabaseKeyStore, @unchecked Sendable 
 
     public func loadOrCreateKey() throws -> Data { key }
 }
-#endif

@@ -19,6 +19,7 @@ The project uses:
 - SwiftUI
 - the official `SQLCipher.swift` Swift Package, pinned to version 4.18.0
 - ZIPFoundation 0.9.20 for in-memory XLSX archive reading
+- CryptoKit for password-derived recovery-backup keys and domain export JSON
 - Keychain Services and LocalAuthentication
 
 The app target includes `SQLITE_HAS_CODEC=1` in Debug and Release. `EncryptedDatabaseService` verifies `PRAGMA cipher_version` and fails closed if the active SQLite connection is not SQLCipher.
@@ -60,6 +61,18 @@ The database uses the schema from the task specification:
 - `change_event`
 
 The database file and its directory use complete iOS file protection. No plaintext database backup is created by the app. The SQLCipher database is only opened and accessed by `EncryptedDatabaseService`; views and the repository never execute SQL directly.
+
+## Backup and export portability
+
+ClassVault keeps three formats separate:
+
+- The live database is an internal SQLCipher SQLite format and uses its own `PRAGMA user_version` schema version.
+- A `.classvaultbackup` is a versioned ZIP recovery package. Its `manifest.json` contains `backupFormat`, `formatVersion`, `databaseSchemaVersion`, component descriptors, and the PBKDF2-SHA256 salt/iteration metadata. `data/core.sqlite` is exported into a new SQLCipher database using a password-derived key, so it does not depend on the original device Keychain key.
+- CSV, XLSX, and JSON are domain-level human-readable exports. They include stable opaque student/contact IDs when relevant, but never include SQLCipher metadata, migration tables, change-event history, Keychain material, or absolute file paths.
+
+Create and restore are available from `Data & Privacy`. Recovery restore reads and validates the manifest and encrypted database in a temporary location first, re-keys the validated database with the current device key, and creates a pre-restore safety copy before replacing the live database. Future/unknown backup components are reported and left untouched in the original backup file.
+
+Plaintext export is always an explicit user action and is preceded by a privacy warning. Temporary backup and export files used to prepare the Files share sheet are deleted after the share/save flow finishes; the user-selected file remains under the user's control. Cloud synchronization is off and the live database directory is excluded from automatic backup.
 
 ## Import workflow
 
@@ -108,4 +121,6 @@ Use synthetic data until the full import, edit, re-import, lock, and call flow p
 - XLSX parsing does not evaluate formulas, interpret merged cells, or join data across multiple worksheets. It selects the first recognizable student worksheet, or the best non-empty worksheet when no sheet matches the student-header heuristic.
 - The project requires Xcode to resolve the SQLCipher binary package and build for Apple platforms.
 - The database key is device-bound. Deleting the app or losing the Keychain item makes the encrypted database unrecoverable by design.
+- Recovery backups use independent passwords and are not tied to the original device Keychain key. Losing a recovery-backup password makes that backup unrecoverable by design.
+- Backup format version 1 currently packages the core database and contact/student modules. Attachment metadata and future module-provider boundaries are defined, but binary attachments and grades are not yet implemented.
 - The default import mode permits name-plus-class matching when student number is absent. Enable `Strict student-number matching` in the preview when every row must contain a student number.

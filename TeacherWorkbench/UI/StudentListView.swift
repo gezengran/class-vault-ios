@@ -5,17 +5,21 @@ struct StudentListView: View {
     @EnvironmentObject private var container: AppContainer
     @StateObject private var viewModel: StudentListViewModel
 
+    let portabilityService: DataPortabilityService
+
     @State private var isShowingFileImporter = false
     @State private var isShowingImportPreview = false
     @State private var isShowingStudentEditor = false
+    @State private var isShowingDataPrivacy = false
     @State private var importPreview: ImportPreview?
     @State private var importResult: ImportResult?
     @State private var pendingArchiveStudent: StudentSummary?
     @State private var errorMessage: String?
     @State private var operationErrorMessage: String?
 
-    init(repository: StudentRepository) {
+    init(repository: StudentRepository, portabilityService: DataPortabilityService) {
         _viewModel = StateObject(wrappedValue: StudentListViewModel(repository: repository))
+        self.portabilityService = portabilityService
     }
 
     var body: some View {
@@ -73,6 +77,14 @@ struct StudentListView: View {
                     }
                     .accessibilityLabel("锁定")
                     .accessibilityIdentifier("lock-button")
+
+                    Button {
+                        isShowingDataPrivacy = true
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                    }
+                    .accessibilityLabel("数据与隐私")
+                    .accessibilityIdentifier("data-privacy-button")
                 }
             }
             .task { viewModel.load() }
@@ -111,6 +123,11 @@ struct StudentListView: View {
                 )
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+            }
+            .fullScreenCover(isPresented: $isShowingDataPrivacy) {
+                DataPrivacyView(portabilityService: portabilityService) {
+                    viewModel.load()
+                }
             }
             .confirmationDialog(
                 "确认删除学生档案？",
@@ -173,9 +190,6 @@ struct StudentListView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("学生档案")
                     .font(.title2.weight(.bold))
-                Text("当前班级用于筛选；小学班级仅作辅助信息")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
 
             Spacer(minLength: 12)
@@ -281,13 +295,23 @@ struct StudentListView: View {
             Button {
                 viewModel.selectedClass = ""
             } label: {
-                Label("全部当前班级", systemImage: viewModel.selectedClass.isEmpty ? "checkmark" : "")
+                HStack {
+                    Text("全部当前班级")
+                    if viewModel.selectedClass.isEmpty {
+                        Image(systemName: "checkmark")
+                    }
+                }
             }
             ForEach(viewModel.classNames, id: \.self) { className in
                 Button {
                     viewModel.selectedClass = className
                 } label: {
-                    Label(className, systemImage: viewModel.selectedClass == className ? "checkmark" : "")
+                    HStack {
+                        Text(className)
+                        if viewModel.selectedClass == className {
+                            Image(systemName: "checkmark")
+                        }
+                    }
                 }
             }
         } label: {
